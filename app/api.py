@@ -38,3 +38,8 @@ def end_response():
     return HTTPResponse(
         status=200
     )
+
+def future_response():
+    return HTTPResponse(
+        status=200
+    )

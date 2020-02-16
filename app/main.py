@@ -2,8 +2,10 @@ import json
 import os
 import random
 import bottle
+import snakeai
 
-from api import ping_response, start_response, move_response, end_response
+from api import ping_response, start_response, move_response, end_response, future_response
+
 
 @bottle.route('/')
 def index():
@@ -54,10 +56,19 @@ def move():
     TODO: Using the data from the endpoint request object, your
             snake AI must choose a direction to move in.
     """
-    print(json.dumps(data))
+    game_data = json.dumps(data)
+    game_data = json.loads(game_data)
+    with open('data.json','a+') as f:
+        json.dump(game_data,f)
+        f.write('\n')
+    print("game_data",json.dumps(data), type(game_data))
+
+    action = snakeai.run_game(game_data)
 
     directions = ['up', 'down', 'left', 'right']
-    direction = random.choice(directions)
+
+    #direction = random.choice(directions)
+    direction = directions[int(action)]
 
     return move_response(direction)
 
@@ -73,6 +84,12 @@ def end():
     print(json.dumps(data))
 
     return end_response()
+
+@bottle.get('/future')
+def future_response():
+    data = bottle.request.json
+    print("FUTURE",json.dumps(data))
+    return future_response()
 
 # Expose WSGI app (so gunicorn can find it)
 application = bottle.default_app()
